@@ -8,7 +8,6 @@ import {
 } from "../services/memberService.js";
 import { MemberInput } from "../types/memberTypes.js";
 
-// Assume `protect` middleware has populated `req.user`
 export const addMemberController = async (
   req: Request<{}, {}, MemberInput>,
   res: Response
@@ -18,13 +17,11 @@ export const addMemberController = async (
       return res.status(401).json({ message: "Not authorized" });
     }
 
-    // Extract clinic_id and check if it exists
     const clinicId = req.user.clinic_id;
     if (!clinicId) {
       return res.status(400).json({ message: "clinic_id is required" });
     }
 
-    // Pass both member data and clinicId to addMember
     const member = await addMember(req.body, clinicId);
     res.status(201).json(member);
   } catch (error) {
@@ -32,7 +29,6 @@ export const addMemberController = async (
   }
 };
 
-// Controller for getting a member by ID
 export const getMemberController = async (
   req: Request<{ id: string }>,
   res: Response
@@ -46,7 +42,6 @@ export const getMemberController = async (
   }
 };
 
-// Controller for updating a member
 export const updateMemberController = async (
   req: Request<{ id: string }, {}, MemberInput>,
   res: Response
@@ -59,7 +54,7 @@ export const updateMemberController = async (
     res.status(400).json({ message: (error as Error).message });
   }
 };
-// Controller for deleting a member
+
 export const deleteMemberController = async (
   req: Request<{ id: string }>,
   res: Response

@@ -1,29 +1,18 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import User from "../models/User.js"; // Importing User model
-import { sendMail } from "../services/emailService.js"; // Importing the email service
-import { MemberInput } from "../types/memberTypes.js"; // Importing MemberInput type
+import User from "../models/User.js";
+import { sendMail } from "../services/emailService.js";
+import { MemberInput } from "../types/memberTypes.js";
 const SALT_ROUNDS = 10;
 
-/**
- * Function to generate a random password.
- * @returns A randomly generated password.
- */
 const generateRandomPassword = (): string => {
-  return crypto.randomBytes(8).toString("hex"); // Generates a random 16-character password
+  return crypto.randomBytes(8).toString("hex");
 };
 
-/**
- * Function to add a new member.
- * @param memberData - The data for the new member.
- * @returns The added member.
- */
 export const addMember = async (memberData: MemberInput, clinicId: string) => {
-  // Generate a random password and hash it
   const randomPassword = generateRandomPassword();
   const hashedPassword = await bcrypt.hash(randomPassword, SALT_ROUNDS);
 
-  // Create a new user with the given data
   const newMemberData = {
     ...memberData,
     password: hashedPassword,
@@ -33,8 +22,7 @@ export const addMember = async (memberData: MemberInput, clinicId: string) => {
   };
   const newMember = await User.create(newMemberData);
 
-  // Send welcome email to the new member
-  const loginLink = `http://localhost:3000/login`; // Replace with actual login URL
+  const loginLink = `http://localhost:3000/login`;
   const emailMessage = `
     Hello ${newMember.name},
 
@@ -57,22 +45,17 @@ export const addMember = async (memberData: MemberInput, clinicId: string) => {
 
   return newMember.toObject();
 };
-/**
- * Function to update a member's details.
- * @param id - The ID of the member to update.
- * @param memberData - The updated member data.
- * @returns The updated member.
- */
+
 export const updateMember = async (
   id: string,
   memberData: Partial<MemberInput>
 ) => {
   const updatedMember = await User.findByIdAndUpdate(
-    id, // Query by MongoDB _id
+    id,
     {
       $set: {
         ...memberData,
-        role: "Member", // Explicitly set role to 'Member'
+        role: "Member",
       },
     },
     { new: true }
@@ -84,23 +67,17 @@ export const updateMember = async (
 
   return {
     ...updatedMember.toObject(),
-    id: updatedMember._id, // Map _id to id for consistent responses
+    id: updatedMember._id,
   };
 };
 
-/**
- * Function to delete a member.
- * @param id - The ID of the member to delete.
- * @returns The deleted member.
- */
 export const deleteMember = async (id: string) => {
-  const deletedMember = await User.findByIdAndDelete(id); // Query by MongoDB _id
+  const deletedMember = await User.findByIdAndDelete(id);
 
   if (!deletedMember) {
     throw new Error("Member not found");
   }
 
-  // Optionally, send a notification that the member has been removed
   await sendMail(
     deletedMember.email,
     "Membership Termination",
@@ -109,28 +86,20 @@ export const deleteMember = async (id: string) => {
 
   return {
     ...deletedMember.toObject(),
-    id: deletedMember._id, // Map _id to id for consistent responses
+    id: deletedMember._id,
   };
 };
-/**
- * Function to get all members.
- * @returns An array of all members.
- */
+
 export const getAllMembers = async (clinicId?: string) => {
   const query = clinicId ? { clinic_id: clinicId } : {};
   const members = await User.find(query);
 
   return members.map((member) => ({
     ...member.toObject(),
-    id: member._id, // Map _id to id for consistent responses
+    id: member._id,
   }));
 };
 
-/**
- * Function to get a member by ID.
- * @param id - The ID of the member to retrieve.
- * @returns The member with the specified ID.
- */
 export const getMemberById = async (id: string) => {
   const member = await User.findById(id);
 

@@ -7,12 +7,10 @@ let firebaseInstance: firebaseAdmin.app.App | null = null;
 
 export const initializeFirebase = () => {
   try {
-    // If already initialized, return existing instance
     if (firebaseInstance) {
       return firebaseInstance;
     }
 
-    // Validate required environment variables
     const requiredEnvVars = [
       "FIREBASE_project_id",
       "FIREBASE_client_email",

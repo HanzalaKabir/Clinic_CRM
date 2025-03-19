@@ -1,18 +1,15 @@
-// src/routes/memberRoutes.ts
-
 import { Router } from "express";
-import { protect } from "../middleware/authMiddleware.js"; // Import your authentication middleware
+import { protect } from "../middleware/authMiddleware.js";
 import {
   addMember,
   deleteMember,
   getAllMembers,
   getMemberById,
   updateMember,
-} from "../services/memberService.js"; // Import member service functions
+} from "../services/memberService.js";
 
 const router = Router();
 
-// Route to add a new member
 router.post("/", protect, async (req, res) => {
   try {
     if (!req.user) {
@@ -21,11 +18,11 @@ router.post("/", protect, async (req, res) => {
     }
 
     const memberData = req.body;
-    const newMember = await addMember(memberData, req.user.clinic_id || ""); // Ensure clinic_id is used correctly
-    res.status(201).json(newMember); // Make sure to return here
+    const newMember = await addMember(memberData, req.user.clinic_id || "");
+    res.status(201).json(newMember);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      res.status(400).json({ message: error.message }); // Return to satisfy TypeScript
+      res.status(400).json({ message: error.message });
     } else {
       res.status(400).json({ message: "An unexpected error occurred" });
       res.status(400).json({ message: "An unexpected error occurred" });
@@ -33,7 +30,6 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
-// Route to update a member by ID
 router.put("/:id", protect, async (req, res) => {
   try {
     const updatedMember = await updateMember(req.params.id, req.body);
@@ -46,7 +42,7 @@ router.put("/:id", protect, async (req, res) => {
     }
   }
 });
-// Route to delete a member by ID
+
 router.delete("/:id", protect, async (req, res) => {
   try {
     const deletedMember = await deleteMember(req.params.id);
@@ -60,7 +56,6 @@ router.delete("/:id", protect, async (req, res) => {
   }
 });
 
-// Route to get all members
 router.get("/", protect, async (req, res) => {
   try {
     const members = await getAllMembers();
@@ -74,7 +69,6 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-// Route to get a member by ID
 router.get("/:id", protect, async (req, res) => {
   try {
     const member = await getMemberById(req.params.id);

@@ -9,7 +9,7 @@ import { IPatient } from "../../types/patientInterface.js";
 
 const convertTo24Hour = (time: string): string => {
   const [rawTime, period] = time.split(" ");
-  if (!period) return time; // Already in 24hr format
+  if (!period) return time;
 
   let [hours, minutes] = rawTime.split(":").map(Number);
 
